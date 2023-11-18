@@ -794,7 +794,7 @@ A.withdraw()
 
 attack(){
 A.withdraw()
-•	}
+}
 
 Eve calls B.attack() -> A.withdraw() -> b.fallback() (executes in loop)
 
@@ -814,11 +814,16 @@ Security tools:
 
 2. Static and dynamic analysis – 
 
-MythX – Symbolic analysis and input fuzzing, 
+MythX – Symbolic analysis and input fuzzing. Does both static and dynamic analysis
 Mythril – the swiss army knife for smart contract security, 
 Slither - Static analysis framework with detectors for many common Solidity issues
 Echidna - The only available fuzzer for Ethereum software. Uses property testing to generate malicious inputs that break smart contracts.
 Manticore - Dynamic binary analysis tool with EVM support
+
+Both MythX and Mythril are created by the same team, and are used to analyze bytecode and locate weaknesses listed in the SWC registry. There are some notable differences:
+•	Mythril is a free and open-source smart contract security analyzer. It uses symbolic execution to detect a variety of security vulnerabilities. It runs on your local machine.
+•	MythX is a cloud-based smart contract security service. It performs security analysis remotely, accepting jobs and returning results via an API. A free version is available, but for a complete analysis you must sign up and purchase a subscription.
+
 
 
 3. Classification - 
