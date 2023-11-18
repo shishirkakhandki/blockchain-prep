@@ -794,7 +794,7 @@ A.withdraw()
 
 attack(){
 A.withdraw()
-}
+•	}
 
 Eve calls B.attack() -> A.withdraw() -> b.fallback() (executes in loop)
 
@@ -809,6 +809,25 @@ Classic, Cross function, Cross contract, Read only re-entrancy
 2. Oracle manipulation 3. Front running 4. Timestamp dependence 5. Insecure arithmetic 6. Denial of service 7. Griefing  8. Force Feeding 9. Deprecated/Historical
 
 Security tools:
+
+1. Visualization - https://consensys.github.io/smart-contract-best-practices/security-tools/visualization/
+
+2. Static and dynamic analysis – 
+
+MythX – Symbolic analysis and input fuzzing, 
+Mythril – the swiss army knife for smart contract security, 
+Slither - Static analysis framework with detectors for many common Solidity issues
+Echidna - The only available fuzzer for Ethereum software. Uses property testing to generate malicious inputs that break smart contracts.
+Manticore - Dynamic binary analysis tool with EVM support
+
+
+3. Classification - 
+
+SWC-Registry - SWC definitions and a large repository of crafted and real-world samples of vulnerable smart contracts.
+SWC Pages - The SWC-registry repo published on Github Pages
+
+
+
 
 
 
