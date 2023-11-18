@@ -1,0 +1,1438 @@
+Crypto Cheat Sheet
+
+
+Security and best practices: 
+https://secureum.substack.com/p/solidity-101
+https://github.com/immunefi-team/Web3-Security-Library#starting-guides
+https://consensys.github.io/smart-contract-best-practices/
+
+
+Index:
+EatTheBlocks blockchain dev roadmaps
+1. Cryptographic hashes   ✅
+2. Public private keys/addresses ✅
+3. Wallets ✅
+4. Data structure of a blockchain ✅
+5. Transactions ✅
+6. Proof of work algorithm ✅
+7. Bitcoin whitepaper
+8. Mastering Bitcoin
+9. Ethereum Yellow Paper
+10. EIPs – EIP 1559, EIP4337 – 3h ✅
+11. Ethereum 2.0 – more transactions, cheaper cost
+12. EVM✅
+13. Solidity✅
+14. Gas optimization – 3hr✅
+15. Security- Security vulnerabilities.  – 3hrs
+16. Testing – Hardhat, foundry
+17. Deployment  - 3hrs
+18. HTML, CSS, JS, React
+19. Ethers
+20. Defi – Should be familiar with main projects and concepts like – ERC20, Decentralized Exchanges, Yield Farming, Staking, Flash loan – 6 hrs
+21. NFT- ERC721 standard, Create an NFT Collection, Mint and NFT, Handle Metadata – 3  hrs
+22. Projects revision – 6 hrs
+
+ERC 4337, 5169, 6551
+Modular blockchains
+
+
+
+Blockchain basics
+
+Each block contains – prev hash, nonce, transaction data, time stamp, current hash
+
+Started to solve Double Spending – since money is in digital form, it can be reused multiple times. Centralized authority to monitor all ledger. 
+
+Public key or asymmetric cryptography uses 2 pair of keys – public and private.
+
+Bob – Lisa. B sends money to L to buy an e-book. 
+
+B sends a message – which has B’s public key, L’s public key, the message (I want an e book), amount and the transaction is signed using B’s private key. 
+
+L verifies the transaction using PKI and B’s public key that it originated from Bob. 
+
+L now has to send the e book to B, so she sends a message which has – the message (Here’s my link to e book), signs it with Bob’s public key that she has received Bob’s request message, and also encrypts the message by a secret key held only by Bob and Alice.  
+Bitcoin used Elliptic Curve Digital Signature Algorithm
+Bitcoin transactions from send to receive
+
+3 parts: 1. Signing 2. Broadcasting 3. Receiving
+
+Signing – When you hit send on wallet, a transaction is created which has – sender, recipient, amount being sent. Then wallet produces a unique digital signature using my private key. All these are clubbed in a small file. Digital signatures are different for each transaction
+
+Broadcasting – Wallet starts sending this file to other computers (nodes) which are running the blockchain. Each node verifies that it is legit i.e if I have the funds and my signature checks out. When a node receives a file it keeps it in a holding area called “mempool”. It is a space for valid but unconfirmed transactions. 
+
+Confirming – Miners group transations together (files sitting in mempool) and create a block of transactions. Then miners compete to get their block on blockchain. 
+
+Think of this block as building blocks. Every confirmed block added afterward makes it harder for the added block to remove. That’s why wait for 6 block confirmations. 
+
+Nonce is a number such that the block’s hash meets a certain criterion. This criterion could be that the generated hash must have its leading four digits to be zero
+
+The Block header (Block hash) contains the hash of prev block, nonce and root hash. 
+
+Hence each block contains – Prev hash, nonce, merkle root and block hash. 
+
+If 2 miners add a block at the same time, the longest subsequent chain always wins
+Attacks - 
+1. Race Attack -  If a vendor delivers service before block confirmation
+2. Finney Attack - Finney explained that a miner can generate a block where he will include a transaction from an address A to another address B, where both addresses belong to him. Then, you will make another payment with the same currencies, sending from address A to address C (which belongs to another user). If said user accepts the transaction without confirmations from the network, the attacker can release the block where his initial transaction is included. This invalidates the transaction made to the merchant allowing the attacker to double spend.
+ 
+
+EIPs - Ethereum Improvement Proposals (EIPs)(opens in a new tab) are standards specifying potential new features or processes for Ethereum. 
+
+EIPs propose improvements to the Ethereum protocol, while ERCs define the rules and specifications for creating new tokens and smart contracts.
+
+20 -  Token standard. Transfer tokens. 
+
+721 - EIP-721, which introduced the ERC-721 standard interface for non-fungible tokens (NFTs). Track and transfer NFTs.
+1559 -  EIP-1559 introduced a new fee structure for Ethereum transactions that aimed to reduce transaction fees and increase the efficiency of the network
+
+3675 – proof of stake
+
+4337 – leading proposal behind account abstraction using alt mempool. Using smart contract wallets instead of EOAs (Externally Owned Accounts). 
+ERC 1155 allows both Fungible ERC20 and Non fungible tokens (ERC721)
+
+
+ 
+
+Ethereum virtual Machine
+
+- Designed as a run time environment for smart contracts
+- Contains its own Turing complete scripting language called Solidity
+- Runs on top of ethereum. Meaning all nodes reach a consensus (just like bitcoin but instead of transaction message, there is code) and execute it. 
+
+
+
+
+1. Structs are created inside contracts. Structs don’t end with semi colons
+
+// SPDX-License-Identifier: MIT
+
+// pure view external
+pragma solidity ^0.8.6;
+contract Test {
+    struct MyStruct {
+        uint256 id;
+        string name;
+        bool isActive;
+    }
+    MyStruct[] public myStructArray;
+    constructor() {
+        myStructArray.push(MyStruct(1, "John", true));
+        myStructArray.push(MyStruct(2, "Alice", false)); // myStructArray.push(MyStruct({id: 2, name: “Alice”, isActive: false}));
+    }
+
+    function getMyStructArray() public view returns (MyStruct[] memory) {
+        return myStructArray;
+    }
+}
+
+2. pragma solidity >=0.5.0 <0.6.0;
+3. Zombies[] public zombies; public comes in between
+4. function functionName(parameters) public/private returns (return type)
+5. Zombie zombie = Zombie (“”, “”); // Zombie is a struct, arrayName.push to push to the array
+6. Pure functions are functions which are not reading from blockchain but just the variables stored in memory
+function add(uint256 a, uint256 b) public pure returns (uint256) {
+        return a + b;
+    }
+7. Assign view for functions which do not modify the params
+8. while casting bracket not to the type
+9. declare event at top – event(uint id, string abs) and emit in function
+10. (uint256 a, uint256 b) = (2, 3); tuple assignment
+
+Smart Contract Engineer
+
+1.  There has to be a comment before SPDX. It is // SPDX-License-Identifier: MIT
+2.  type access-modifier variable name;
+3.  bytes are fixed size array (bytesN) or dynamic size array
+4.  uint stands for unsigned integer, meaning non negative integers
+    different sizes are available
+    uint8 ranges from 0 to 2 \*\* 8 - 1
+5.  Negative numbers are allowed for int types.
+    Like uint, different ranges are available from int8 to int256
+    int256 ranges from -2 ** 255 to 2 ** 255 - 1
+6.  local variables are not stored on blockchain. state vars are stored on blockchain
+7.  global variables are predefined variables that provide information about the current blockchain state and transaction context eg: msg.sender, msg.value, block.timestamp
+8.  Immutable variables are like constants. Values of immutable variables can be set inside the constructor but cannot be modified afterwards.
+9.  To write or update a state variable you need to send a transaction. That is set in a function. This is prior to solidity 0.8
+10. 1 ether is equal to 10^18 wei. The ether and wei can only be used with uint or 10^19 gwei. 
+11. Using up all of the gas that you send causes your transaction to fail. State changes are undone. Gas spent are not refunded.
+12. uint[] public array; in a fixed size array all elements are initialized to 0 before initializing. Array has .push(val) and .pop() methods
+13. enum Status {
+    Pending,
+    Shipped,
+    Accepted,
+    Rejected,
+    Canceled
+    }
+
+    Status public status;
+
+14. struct Todo {
+    string text;
+    bool completed;
+    }
+
+    // An array of 'Todo' structs
+    Todo[] public todos;
+
+    function create(string calldata \_text) public {
+    // 3 ways to initialize a struct
+    // - calling it like a function
+    todos.push(Todo(\_text, false));
+
+        // key value mapping
+        todos.push(Todo({text: _text, completed: false}));
+
+        // initialize an empty struct and then update it
+        Todo memory todo;
+        todo.text = _text;
+        // todo.completed initialized to false
+
+        todos.push(todo);
+
+    }
+
+15. Variables are declared as either storage, memory or calldata to explicitly specify the location of the data.
+    storage - variable is a state variable (store on blockchain)
+    memory - memory is used for temporary data storage within function execution.
+    calldata - the data field passed as a parameter to .send({ ... }) or .sendTransaction({ ... }) in web3.js is calldata. calldata args cannot be modified. Calldata is useful for passing large amounts of data to a function without having to copy the data into memory, which can be expensive in terms of gas usage. By using calldata, you can avoid the overhead of copying data into memory and reduce the amount of gas needed to execute the function.
+16. View function declares that no state will be changed.
+    Pure function declares that no state variable will be changed or read.
+17. constructor() is X(inputs), Y(inputs) {
+    } X and Y are base contracts, Y is child contract
+18. Inheritence
+    Solidity supports multiple inheritance. Contracts can inherit other contract by using the is keyword.
+    Function that is going to be overridden by a child contract must be declared as virtual. (In parent    contract)
+    Function that is going to override a parent function must use the keyword override.
+    Order of inheritance is important.
+    You have to list the parent contracts in the order from “most base-like” to “most derived”.
+19. events are logged into the transaction log. event data is stored in the Transaction Receipts trie
+20. Multiple inheritence - While using at the top beside order most base like to most derived. When invoking, it happens from right to left. Contracts can inherit from multiple parent contracts. When a function is called that is defined multiple times in different contracts, parent contracts are searched from right to left, and in depth-first manner.
+21. You can interact with other contracts by declaring an Interface.
+
+Interface
+
+cannot have any functions implemented
+can inherit from other interfaces
+all declared functions must be external
+cannot declare a constructor
+cannot declare state variables
+
+interface ICounter {
+function count() external view returns (uint);
+
+    function increment() external;
+
+}
+
+contract MyContract {
+function incrementCounter(address _counter) external {
+ICounter(_counter).increment();
+// _counter is the address of the contract which is implemented this interface
+}
+
+    function getCount(address _counter) external view returns (uint) {
+        return ICounter(_counter).count();
+    }
+
+} 
+
+To call the function of other contract, first create the instance of the contract like – 
+OtherContract otherContractInstance = OtherContract(address of other contract);
+
+Similarly, you can also create an instance of interface – 
+OtherContractInterface otherContractInterfaceInstance = OtherContractInterface(OtherContractImplementationContractAddress);
+
+23. Functions and addresses declared payable can receive ether into the contract. 
+
+24. In solidity, address is a special type which has built in member variable called balance. Hence to get the balance of a contract you do - uint balance = address(this).balance; 
+
+25. Sending ether(transfer, call, send)
+call is the preferred method
+
+How to send Ether?
+You can send Ether to other contracts by
+
+transfer (2300 gas, throws error) - _to.transfer(msg.value);
+send (2300 gas, returns bool) - bool sent = _to.send(msg.value);
+call (forward all gas or set gas, returns bool) - (bool sent, bytes memory data) = _to.call{value: msg.value}("");
+
+The call function provides the most flexibility and control when transferring Ether. It allows you to specify additional parameters and invoke functions in the recipient’s contract. When using call for Ether transfer, the recipient’s contract must implement a fallback function to receive the Ether. The fallback function is executed when a contract receives Ether without any specific function call. It’s important to handle the return value properly and include appropriate error-checking mechanisms.
+Syntax: (bool sent,memory data) = recipient.call.value(amount)("");
+
+How to receive Ether?
+A contract receiving Ether must have at least one of the functions below
+
+receive() external payable
+fallback() external payable
+receive() is called if msg.data is empty, otherwise fallback() is called.
+
+msg.data represents complete call data i.e. function selector and args
+
+Which function is called, fallback() or receive()?
+
+           
+           send Ether
+               |
+         msg.data is empty?
+              / \
+            yes  no
+            /     \
+receive() exists?  fallback()
+         /   \
+        yes   no
+        /      \
+    receive()   fallback()
+
+Which method should you use?
+call in combination with re-entrancy guard is the recommended method to use after December 2019.
+
+Guard against re-entrancy by
+
+making all state changes before calling other contracts
+using re-entrancy guard modifier
+
+26. fallback is a special function that is executed either when
+
+a function that does not exist is called or
+Ether is sent directly to a contract but receive() does not exist or msg.data is not empty
+
+27. call is a low level function to interact with other contracts.
+
+This is the recommended method to use when you're just sending Ether via calling the fallback function.
+
+However it is not the recommend way to call existing functions.
+
+(bool success, bytes memory data) = _addr.call{value: msg.value, gas: 5000}(abi.encodeWithSignature("foo(string,uint256)", "call foo", 123));
+
+28. delegatecall is a low level function similar to call.
+
+When contract A executes delegatecall to contract B, B's code is executed
+
+with contract A's storage, msg.sender and msg.value. Think of it like the called contract's function getting executed in caller contract. 
+
+29. When a function is called, the first 4 bytes of calldata specifies which function to call.
+This 4 bytes is called a function selector.
+
+30. To call other contract, just do -  
+C = callee, B - caller
+inside B:
+C cInstance = C(address of C)
+
+This is similar to interface. Can also be done using call, but it is not recommended. 
+
+31. Contract can also be called using new keyword:
+Car car = new Car(_owner, _model);
+here _owner and _model are  the args of constructor 
+
+Create and send ether 
+Car car = (new Car){value: msg.value}(_owner, _model);
+
+32. try / catch can only catch errors from external function calls and contract creation.
+
+33. Libraries are similar to contracts, but you can't declare any state variable and you can't send ether.
+A library is embedded into the contract if all library functions are internal.
+Otherwise the library must be deployed and then linked before the contract is deployed.
+
+await hre.deployments.link(MainContract, "SquareLibrary", squareLibraryAddress);
+add  using SquareLibrary for uint256; in main contract
+
+34. abi.encode encodes data into bytes.
+
+abi.decode decodes bytes back into data.
+
+35. Example of hash collision
+    Hash collision can occur when you pass more than one dynamic data type to abi.encodePacked. In such case, you should use abi.encode instead.
+
+    encodePacked(AAA, BBB) -> AAABBB
+    encodePacked(AA, ABBB) -> AAABBB
+    return keccak256(abi.encodePacked(_text, _anotherText));
+
+36. Some gas saving techniques.
+1. Unless iteration is required, use mappings instead of arrays
+2. Enable compiler optimizer
+solidity: {
+    version: "0.8.9",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 10000,
+      },
+    },
+  },
+3. Minimize onchain data
+Because on-chain data is limited to what can be created natively inside a blockchain network (e.g. state, account addresses, balances, etc.), you can reduce unnecessary operations and complex computations by saving less data in storage variables, batching operations, and avoiding looping.
+
+The less data you save in storage variables, the less gas you'll need. Keep all data off-chain and only save the smart contract’s critical info on-chain. Developers can create more complex applications, including prediction markets, stablecoins, and parametric insurance, by integrating off-chain data into a blockchain network. 
+Using events to store data is a popular, but ill-advised method for gas optimization because, while it is less expensive to store data in events relative to variables, the data in events cannot be accessed by other smart contracts on-chain. 
+4. Batching Operations
+Batching operations enables developers to batch actions by passing dynamically sized arrays that can execute the same functionality in a single transaction, rather than requiring the same method several times with different values. 
+5. Looping
+Avoid looping through lengthy arrays; not only will it consume a lot of gas, but if gas prices rise too much, it can even prevent your contract from being carried out beyond the block gas limit.
+Instead of looping over an array until you locate the key you need, use mappings, which are hash tables that enable you to retrieve any value using its key in a single action.
+6. 4. Use Indexed Events 
+Events are used to let users know when something occurs on the blockchain, as smart contracts cannot hear events on their own because contract data lives in the States trie, and event data is stored in the Transaction Receipts trie.
+Events in Solidity are a shortcut to speed up the development of external systems working in combination with smart contracts. All information in the blockchain is public, and any activity can be detected by closely examining the transactions.
+Including a mechanism to keep track of a smart contract's activity after it is deployed is helpful in reducing overall gas. While looking at all of the contract's transactions is one way to keep track of the activity, because message calls between contracts are not recorded on the blockchain, that approach might not be sufficient. 
+5. Use uint8 Can Increase Gas Cost
+A smart contract's gas consumption can be higher if developers use items that are less than 32 bytes in size because the Ethereum Virtual Machine can only handle 32 bytes at a time. In order to increase the element's size to the necessary size, the EVM has to perform additional operations. 
+6. Pack Your Variables 
+When processing data, the EVM adopts a novel approach: each contract has a storage location where data is kept permanently, as well as a persistent storage space where data can be read, written, and updated.
+There are 2,256 slots in the storage, each of which holds 32 bytes. Depending on their particular nature, the "state variables," or variables declared in a smart contract that are not within any function, will be stored in these slots. 
+Smaller-sized state variables (i.e. variables with less than 32 bytes in size), are saved as index values in the sequence in which they were defined, with 0 for position 1, 1 for position 2, and so on. If small values are stated sequentially, they will be stored in the same slot, including very small values like uint64.
+7. Free Up Unused Storage
+8. Store Data in calldata Instead of Memory for Certain Function Parameters 
+9. Use immutable and constant
+Immutable and constant are keywords that can be used on state variables to limit changes to their state. Constant variables cannot be changed after being compiled, whereas immutable variables can be set within the constructor. 
+10. Use the external Visibility Modifier
+Use the external function visibility for gas optimization because the public visibility modifier is equivalent to using the external and internal visibility modifier, meaning both public and external can be called from outside of your contract, which requires more gas.
+Replacing memory with calldata
+Loading state variable to memory
+Replace for loop i++ with ++i
+Caching array elements
+Short circuit
+Organize & try to pack two or more storage variables into one it's much cheaper
+Also while using structs, try to pack them
+Make solidity values constant where possible
+Overflow and underflow of numbers in Solidity 0.8 throw an error. This can be disabled by using unchecked.
+Disabling overflow / underflow check saves gas.
+
+37. Merkle tree allows you to cryptographically prove that an element is contained in a set without revealing the entire set.
+
+38. constructor(params) ParentContract(parent params) {}
+
+39. In the context of ERC20 and ERC721 tokens, the approve function is used to allow another address (often referred to as a "spender") to spend or transfer tokens on behalf of the token owner.
+
+40. ERC1155 allows both Fungible ERC20 and Non fungible tokens (ERC721)
+
+41. Are smart contracts immutable? 
+- Using openzeppelin upgrade plugins smart contracts can be upgraded while preserving their address, state and balance. The plugin is deployProxy. The smart contracts deployed using deploy proxy are all upgradable smart contracts. 
+- DeployProxy deploys 3 contracts – Impl contract, Proxy Admin contract, Proxy contract
+- User -> Proxy Contract -> Impl contract
+- The user interacts with the Proxy contract and not the main impl contract. 
+- The proxy contract used delegateCall function, i.e. it uses the logic from impl contract but its state is from its own
+- Hence this line - upgraded while preserving their address, state and balance
+Proxy has issues – storage clashes (a new variable is created in the same location as the previous contract’s), function selector clashes (same function is present in impl contract and proxy contract)
+
+Can be done in 3 ways - 
+Deploy proxy manually
+Using hardhat deploy
+Using openzeppelin upgrades plugin
+
+
+42. assembly, you can write to any slot of Solidity storage
+---------------
+Security
+
+Tenderly – How to monitor smart contract
+1. Register a smart contract 2. Then check transactions in transaction tab
+
+Now set up an alert for this, i.e, if a transaction fails send an email 
+
+2. Run a simulation on the mainnet and how to debug a smart contract
+This is done in simulation tab. Copy the input data, contract address from metamask but don’t hit send. Input data = hex data.
+
+3. How to debug using Tenderly
+Click on search bar at the top and paste the transaction hash you want to debug. 
+-	Prevent sandwich attack by sending transactions to flash bots where they are anonymous in mempool unlike normal mempool which is public. 
+-	You need a dependency – flashbots/ethers-provider-bundle. For a flash bot to include your transaction there is a minimum amount of gas that you have to use. 42000
+
+4. Finding bugs with echidna
+Echidna used docker and tests using fuzzing i.e testing the contract with random values and then calling the test function. 
+Consensys
+Any non-trivial contract will have errors in it. Your code must, therefore, be able to respond to bugs and vulnerabilities gracefully.
+-	Pause the contract when things are going wrong ('circuit breaker')
+-	Manage the amount of money at risk (rate limiting, maximum usage)
+-	Have an effective upgrade path for bugfixes and improvements
+-	Upgrade to the latest version of any tool or library as soon as possible
+-	Ensure the contract logic is simple
+-	Modularize code to keep contracts and functions small
+-	Use already-written tools or code where possible (eg. don't roll your own random number generator)
+-	Prefer clarity to performance whenever possible
+-	Only use the blockchain for the parts of your system that require decentralization
+-	Test contracts thoroughly, and add tests whenever new attack vectors are discovered
+-	Provide bug bounties starting from alpha testnet releases
+-	Rollout in phases, with increasing usage and testing in each phase
+-	Be extremely careful about external and public contract calls, which may execute malicious code and change control flow.
+-	Be aware that timestamps are imprecise on a blockchain, miners can influence the time of execution of a transaction within a margin of several seconds.
+-	Randomness is non-trivial on blockchain, most approaches to random number generation are gameable on a blockchain.
+Simplicity vs Complexity
+-	An ideal smart contract system from a software engineering bias is modular, reuses code instead of duplicating it, and supports upgradeable components.
+-	There are important exceptions where security and software engineering best practices may not be aligned. In each case, the proper balance is obtained by identifying the optimal mix of properties along contract system dimensions such as:
+i. Rigid versus Upgradeable
+ii. Monolithic versus Modular
+iii. Duplication versus Reuse
+Modular vs Monolithic Blockchains
+- A modular chain only focuses on specific tasks, while offloading the rest to other layers.
+
+
+Development Recommendations
+
+General - Guiding principles that should be kept in mind during development
+
+1. Use caution when making external calls
+2. Mark untrusted contracts
+When interacting with externalcontracts, name your variables, methods, and contract interfaces in a way that makes it clear that interacting with them is potentially unsafe. This applies to your own functions that call external contracts.
+3. Avoid state changes after external calls
+4. Don't use transfer() or send(). Use call()
+5. Handle errors in external calls. 
+6. Favor pull over push for external calls
+External calls can fail accidentally or deliberately. To minimize the damage caused by such failures, it is often better to isolate each external call into its own transaction that can be initiated by the recipient of the call. This is especially relevant for payments, where it is better to let users withdraw funds rather than push funds to them automatically. (This also reduces the chance of problems with the gas limit.) Avoid combining multiple ether transfers in a single transaction.
+7. Don't delegatecall to untrusted code
+The delegatecall function is used to call functions from other contracts as if they belong to the caller contract. Thus the callee may change the state of the calling address. This may be insecure. An example below shows how using delegatecall can lead to the destruction of the contract and loss of its balance.
+
+contract Destructor
+{
+function doWork() external
+{
+selfdestruct(0);
+}
+}
+
+contract Worker
+{
+function doWork(address _internalWorker) public
+{
+// unsafe
+_internalWorker.delegatecall(bytes4(keccak256("doWork()")));
+}
+}
+
+If Worker.doWork() is called with the address of the deployed Destructor contract as an argument, the Worker contract will self-destruct. Delegate execution only to trusted contracts, and never to a user supplied address.
+
+8. Force-feeding Ether
+
+Beware of coding an invariant that strictly checks the balance of a contract.
+
+An attacker can forcibly send ether to any account and this cannot be prevented (not even with a fallback function that does a revert()).
+
+The attacker can do this by creating a contract, funding it with 1 wei, and invoking selfdestruct(victimAddress). No code is invoked in victimAddress, so it cannot be prevented. This is also true for block reward which is sent to the address of the miner, which can be any arbitrary address.
+
+Also, since contract addresses can be precomputed, ether can be sent to an address before the contract is deployed.
+
+9. Public on-chain Data
+
+Many applications require submitted data to be private up until some point in time in order to work. Games (eg. on-chain rock-paper-scissors) and auction mechanisms (eg. sealed-bid Vickrey auctions) are two major categories of examples. If you are building an application where privacy is an issue, make sure you avoid requiring users to publish information too early. The best strategy is to use commitment schemes with separate phases: first commit using the hash of the values and in a later phase revealing the values.
+
+10. Unreliable Participants - Do not make refund or claim processes dependent on a specific party performing a particular action with no other way of getting the funds out.
+
+11. Negation of Signed Integers
+
+Solidity provides several types to work with signed integers. Like in most programming languages, in Solidity a signed integer with N bits can represent values from -2^(N-1) to 2^(N-1)-1. This means that there is no positive equivalent for the MIN_INT. Negation is implemented as finding the two's complement of a number, so the negation of the most negative number will result in the same number.
+
+This is true for all signed integer types in Solidity (int8, int16, ..., int256).
+
+contract Negation {
+function negate8(int8 _i) public pure returns(int8) {
+return -_i;
+}
+
+function negate16(int16 _i) public pure returns(int16) {
+return -_i;
+}
+
+int8 public a = negate8(-128); // -128
+int16 public b = negate16(-128); // 128
+int16 public c = negate16(-32768); // -32768
+}
+
+One way to handle this is to check the value of a variable before negation and throw if it's equal to the MIN_INT. Another option is to make sure that the most negative number will never be achieved by using a type with a higher capacity (e.g. int32 instead of int16).
+
+A similar issue with int types occurs when MIN_INT is multiplied or divided by -1.
+
+
+Precautions
+
+It is impossible to know in advance whether your code is secure. However, you can architect your contracts in a way that allows them to fail gracefully, and with minimal damage. This section presents a variety of techniques that will help you prepare for failure.
+
+Note: There's always a risk when you add a new component to your system. A badly designed fail-safe could itself become a vulnerability, as can the interaction between a number of well-designed fail-safes. Be thoughtful about each technique you use in your contracts, and consider carefully how they work together to create a robust system.
+
+ - Upgradability
+
+Code will need to be changed if errors are discovered or if improvements need to be made. It is no good to discover a bug, but have no way to deal with it.
+
+Designing an effective upgrade system for smart contracts is an area of active research, and we won't be able to cover all of the complications in this document. However, two basic approaches are most commonly used. The simpler of the two is to have a registry contract that holds the address of the latest version of the contract. A more seamless approach for contract users is to have a contract that forwards calls and data onto the latest version of the contract.
+
+Whatever the technique, it's important to have modularization and good separation between components, so that code changes do not break functionality, orphan data, or require substantial costs to port. In particular, it is usually beneficial to separate complex logic from your data storage, so that you do not have to recreate all of the data in order to change the functionality.
+
+2 approaches : 1. Use registry contract 2. Use delegate call. 
+
+- Delegate Call
+
+Remember that delegatecall is a special function in Solidity that executes the logic of the called address (LogicContract) in the context of the calling contract (Relay), so "storage, current address and balance still refer to the calling contract , only the code is taken from the called address".
+
+How the EVM handles the layout of state variables in storage, including packing multiple variables into a single storage slot if possible
+How and why the order of inheritance impacts the storage layout
+Why the called contract (LogicContract) must have the same storage layout of the calling contract (Relay), and only append new variables to the storage (see Background on delegatecall)
+How a contract's constructor can affect upgradeability
+How the ABI specifies function selectors and how function-name collision can be used to exploit a contract that uses delegatecall
+How delegatecall to a non-existent contract will return true even if the called contract does not exist. For more details see Breaking the proxy pattern and Solidity docs on Error handling.
+Remember the importance of immutability to achieve trustlessness
+
+
+- Circuit Breakers 
+
+Circuit breakers stop execution if certain conditions are met, and can be useful when new errors are discovered. For example, most actions may be suspended in a contract if a bug is discovered, and the only action now active is a withdrawal. You can either give certain trusted parties the ability to trigger the circuit breaker or else have programmatic rules that automatically trigger the certain breaker when certain conditions are met.
+
+
+- Speed bumps
+Speed bumps slow down actions, so that if malicious actions occur, there is time to recover.
+
+- Rate limiting
+Rate limiting halts or requires approval for substantial changes. For example, a depositor may only be allowed to withdraw a certain amount or percentage of total deposits over a certain time period (e.g., max 100 ether over 1 day) - additional withdrawals in that time period may fail or require some sort of special approval. Or the rate limit could be at the contract level, with only a certain amount of tokens issued by the contract over a time period.
+
+- Deployment 
+Contracts should have a substantial and prolonged testing period - before substantial money is put at risk.
+
+At minimum, you should:
+
+Have a full test suite with 100% test coverage (or close to it)
+Deploy on your own testnet
+Deploy on the public testnet with substantial testing and bug bounties
+Exhaustive testing should allow various players to interact with the contract at volume
+Deploy on the mainnet in beta, with limits to the amount at risk
+
+AUTOMATIC DEPRECATION¶
+During testing, you can force an automatic deprecation by preventing any actions, after a certain time period. For example, an alpha contract may work for several weeks and then automatically shut down all actions, except for the final withdrawal.
+
+
+modifier isActive(){
+  reqquire(,);
+  _;
+}
+
+function deposit() public isActive {
+}
+
+RESTRICT AMOUNT OF ETHER PER USER/CONTRACT¶
+In the early stages, you can restrict the amount of Ether for any user (or for the entire contract) - reducing the risk.
+
+- Safe Haven
+
+Some tips for running bounty programs:
+
+Decide which currency bounties will be distributed in (BTC and/or ETH)
+Decide on an estimated total budget for bounty rewards
+From the budget, determine three tiers of rewards:
+smallest reward you are willing to give out
+highest reward that's usually awardable
+an extra range to be awarded in case of very severe vulnerabilities
+Determine who the bounty judges are (3 may be ideal typically)
+Lead developer should probably be one of the bounty judges
+When a bug report is received, the lead developer, with advice from judges, should evaluate the severity of the bug
+Work at this stage should be in a private repo, and the issue filed on Github
+If it's a bug that should be fixed, in the private repo, a developer should write a test case, which should fail and thus confirm the bug
+Developer should implement the fix and ensure the test now passes; writing additional tests as needed
+Show the bounty hunter the fix; merge the fix back to the public repo is one way
+Determine if bounty hunter has any other feedback about the fix
+Bounty judges determine the size of the reward, based on their evaluation of both the likelihood and impact of the bug.
+Keep bounty participants informed throughout the process, and then strive to avoid delays in sending them their reward
+
+Solidity Specific Best Practices
+
+- Assert, require, revert
+
+Enforce invariants with assert()
+
+Assert guards should often be combined with other techniques, such as pausing the contract and allowing upgrades. (Otherwise, you may end up stuck, with an assertion that is always failing.)
+
+Use assert(), require(), revert() properly
+
+Assert: The assert function should only be used to test for internal errors, and to check invariants. It is used to check for code errors, such as integer overflows or underflows. If the condition evaluates to false, the contract will immediately stop executing and any state changes made so far will be rolled back. Unlike require and revert, assert is not used for checking user inputs or enforcing preconditions
+
+Require: The require function should be used to ensure valid conditions, such as inputs, or contract state variables are met, or to validate return values from calls to external contracts.
+
+Modifiers as guards: 
+The code inside a modifier is usually executed before the function body, so any state changes or external calls will violate the Checks-Effects-Interactions pattern. Moreover, these statements may also remain unnoticed by the developer, as the code for modifier may be far from the function declaration. For example, an external call in modifier can lead to the reentrancy attack:
+
+contract Registry {
+address owner;
+
+function isVoter(address _addr) external returns(bool) {
+// Code
+}
+}
+
+contract Election {
+Registry registry;
+
+modifier isEligible(address _addr) {
+require(registry.isVoter(_addr));
+_;
+}
+
+function vote() isEligible(msg.sender) public {
+// Code
+}
+}
+
+In this case, the Registry contract can make a reentrancy attack by calling Election.vote() inside isVoter().
+
+Integer Division: 
+
+All integer division rounds down to the nearest integer. If you need more precision, consider using a multiplier, or store both the numerator and denominator.
+
+(In the future, Solidity will have a fixed-point type, which will make this easier.)
+
+// bad
+uint x = 5 / 2; // Result is 2, all integer division rounds DOWN to the nearest integer
+
+Using a multiplier prevents rounding down, this multiplier needs to be accounted for when working with x in the future:
+
+// good
+uint multiplier = 10;
+uint x = (5 * multiplier) / 2;
+
+Storing the numerator and denominator means you can calculate the result of numerator/denominator off-chain:
+
+// good
+uint numerator = 5;
+uint denominator = 2;
+
+Abstract vs Interfaces: 
+
+Read from elsewhere
+Fallback:
+
+A contract can have at most one fallback function, declared using either fallback () external [payable] or fallback (bytes calldata input) external [payable] returns (bytes memory output) (both without the function keyword). This function must have external visibility. A fallback function can be virtual, can override and can have modifiers.
+
+The fallback function is executed on a call to the contract if none of the other functions match the given function signature, or if no data was supplied at all and there is no receive Ether function. The fallback function always receives data, but in order to also receive Ether it must be marked payable.
+
+Log events in fallback function and keep it simple
+
+Payability: 
+
+Starting from Solidity 0.4.0, every function that is receiving ether must use payable modifier, otherwise if the transaction has msg.value > 0 will revert
+
+Visibility:
+Explicitly label the visibility of functions and state variables. Functions can be specified as being external, public, internal or private
+
+Locking Pragmas:
+Contracts should be deployed with the same compiler version and flags that they have been tested the most with. Locking the pragma helps ensure that contracts do not accidentally get deployed using, for example, the latest compiler which may have higher risks of undiscovered bugs.
+
+Event Monitoring: 
+An event is a convenient way to log something that happened in the contract. Events that were emitted stay in the blockchain along with the other contract data and they are available for future audit
+
+Shadowing:
+It is currently possible to shadow built-in globals in Solidity. This allows contracts to override the functionality of built-ins such as msg and revert(). Although this is intended, it can mislead users of a contract as to the contract's true behavior.
+
+tx.origin:
+Tx.origin is a global variable in Solidity that returns the address of the original external owned account (EOA) that started the transaction. It is different from msg.sender, which returns the immediate account (external or contract account) that invoked certain function. tx.origin traces back to the external user or entity who started the chain of transactions, even if there were intermediate contract calls in the process.
+
+msg.sender refers to the Ethereum address of the account that is currently interacting with a smart contract. This address could be an externally owned account (EOA) or another smart contract.
+
+Never use tx.origin for authorization. Use msg.sender
+
+Timestamp Manipulation:
+Be aware that the timestamp of the block can be manipulated by a miner. Dont use Timestamps for random number. If the scale of your time-dependent event can vary by 15 seconds and maintain integrity, it is safe to use a block.timestamp.
+
+Multiple inheritence:
+Order of inheritence = most base like to most derived. Z inherits from both Y and X. Order of most base like to derived = X Y Z. contract Z is X, Y (after the keyword is the parents are listed from the most base-like to the most derived). When a contract is deployed, the compiler will linearize the inheritance from right to left.  
+
+Writing order most base like to most derived. 
+
+Calling order right to left, depth first manner
+
+X
+|    \
+|     Y
+|   /
+Z  
+
+
+             X
+         /       \      X, Y, A, B, Z
+        Y       A
+         |        |
+         |        B
+           \     /
+              Z
+
+Interface Types:
+When a function takes a contract address as an argument, it is better to pass an interface or contract type rather than a raw address.
+
+EXTCODESIZE Checks
+Avoid using extcodesize to check for Externally Owned Accounts.
+
+Token Specific
+
+Contract Address
+The modifier should then be applied to the "transfer" and "transferFrom" methods
+
+An example of implementing both the above recommendations would be to create the following modifier; validating that the "to" address is neither 0x0 nor the smart contract's own address:
+
+modifier validDestination( address to ) {
+require(to != address(0x0));
+require(to != address(this) );
+_;
+}
+
+
+Attacks
+
+2 contracts -  A and B
+
+Contract A calls B. Idea of reentrancy is that B can still call A, while A is still executing. 
+
+A has 9 eth and B has 1 eth. 
+
+A has a withdraw function - 
+
+A - 9 eth
+B - 1 eth
+withdraw() {
+    check balance > 0
+    send ether 
+    balance = 0
+}
+
+
+B 
+fallback() {
+A.withdraw()
+}
+
+attack(){
+A.withdraw()
+}
+
+Eve calls B.attack() -> A.withdraw() -> b.fallback() (executes in loop)
+
+How to prevent 
+Update state variables before you make any external calls
+Using the modifier - reentrancy guard
+
+4 types of reentrancies 
+
+Classic, Cross function, Cross contract, Read only re-entrancy
+
+2. Oracle manipulation 3. Front running 4. Timestamp dependence 5. Insecure arithmetic 6. Denial of service 7. Griefing  8. Force Feeding 9. Deprecated/Historical
+
+Security tools:
+
+
+
+-------------
+Hardhat course
+Harhat, Compilation, Testing (Mocha), Debugging, Deployment. 
+
+Hardhat - 
+Installation – npm init –yes, npm install –save-dev  hardhat, npx hardhat, npm install --save-dev @nomiclabs/hardhat-ethers ethers @nomiclabs/hardhat-waffle ethereum-waffle chai, 
+
+Mocha is general purpose testing framework and Chai is an assertion library, both for testing javascript applications, Waffle is built on top of mocha to also test smart contracts specifically. 
+
+1. Import require(@nomiclabs/hardhat-waffle) in hardhat.config.js file
+2. For compiling – npx hardhat compile
+3. Format of mocha with chai :
+const {expect} = require("chai");
+const {ethers} = require("hardhat");
+describe("", function(){ 
+  it("", async function(){
+     expect(expected, actual)
+    });
+});
+
+4. Deployment script
+
+const { ethers } = require("hardhat");
+
+async function main() {
+  const [deployer] = await ethers.getSigners();
+  const token = await ethers.getContractFactory("Token");
+  const deployedInstance = await token.deploy();
+  console.log("Token address: ", deployedInstance.address);
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+
+Npx hardhat run scripts/deploy.js
+
+Assembly YUL
+
+Yul program has to be in assembly block
+Assignment is using ‘:=’ like value := 100 to assign 100 to value and without semicolon
+
+
+
+
+
+
+
+
+Oracles
+1.	To pull data from another contract, we need its ABI
+2.	Constructor is defined as constructor() public {}
+3.	(,int feed,,,) = priceFeed.getLatestRoundData() – using tuples
+4.	Two transaction architecture - 
+The first step is when a smart contract (called the "callee contract" our contract) makes a "request" to a Chainlink node which is comprised of a smart contract and the corresponding off-chain node. When it receives the request, the smart contract emits a specific event that the corresponding Chainlink node is subscribed to/looking for. This happens in one transaction.
+The Chainlink oracle will then process the request (be it randomness, a data request, etc), and return the data/computation back to the callee contract, or a contract that will in turn send the response to the callee contract. This "middle" contract is often referred to as the "oracle contract". This return process happens in a second separate transaction, so in total the basic request model is a two transaction event, and therefore, will take at the very minimum two blocks to complete.
+
+Advanced Solidity
+1.	Solidity doesn't have native string comparison, so we
+             // compare their keccak256 hashes to see if the strings are equal)
+  require(keccak256(abi.encodePacked(_name)) == keccak256(abi.encodePacked("Vitalik")));
+2.	Interfaces can also be created using the keyword contract and only declaring the function signature. 
+3.	For a smart contract c1 to call a function foo() in other contract – c2
+- define interface of c2 in a new file c2Interface.sol (functions should be extrenal)
+- import the contents of c2Interface.sol in c1 
+- instantiate c1 contract using c2Interface _c2Interface  = c2Interface(_address of c2);
+4.	To access this interface – InterfaceName varName = InterfaceName(address of Interface on blockchain) : KittyInterface kittyContract = KittyInterface(ckAddress);
+5.	Never hardcode external dependencies 
+6.	Be mindful of external, public functions as they can be accessed by anybody
+7.	constructor() is a constructor, which is an optional special function. It will get executed only one time, when the contract is first created.
+8.	So the Ownable contract basically does the following:
+When a contract is created, its constructor sets the owner to msg.sender (the person who deployed it)
+It adds an onlyOwner modifier, which can restrict access to certain functions to only the owner
+It allows you to transfer the contract to a new owner
+onlyOwner is such a common requirement for contracts that most Solidity DApps start with a copy/paste of this Ownable contract, and then their first contract inherits from it.
+9.	Use uint small sized but only in structs as it will pack multiple to save gas if they are together
+10.	now returns current timestamp uint256. uint cooldownTime = 1 days;
+11.	Examine all external and public functions
+12.	_; is used in modifiers
+13.	calldata (special data location that contains the function arguments, only available for external function call parameters).
+14.	Use external view for read only functions wherever possible. View functions are only free when called externally. 
+15.	To reduce gas: rebuilding an array in memory every time a function is called instead of simply saving that array in a variable for quick lookups
+16.	Memory arrays must be created with length argument -  uint[] memory values = new uint[](3);
+17.	Also think of future implementations while writing code. If a new feature is introduced, will my code be gas effective. Like transferring a zombie from one owner to array is inefficient if you use a mapping(address=>uint)
+18.	Pure functions – no read no write to blockchain
+19.	A function can only receive money if it is marked as payable. Then the sent money gets stored in contract’s ethereum account.
+20.	To transfer ether – receivers address.transfer(address(this).balance); // receiver’s address should be address payable type
+Eg:  address payable _owner = address(uint160(owner()));
+owner.transfer(address(this).balance);
+21.	Address object methods:
+ ref - https://jeancvllr.medium.com/solidity-tutorial-all-about-addresses-ffcdf7efc4e7
+methods related to ethers: .balance, .transfer() and .send()
+methods related to contract interactions: .call() , .delegatecall() and .staticcall()
+methods with address payable: .transfer() , .send() , .call() , .delegatecall() and .staticcall()
+
+ERC721
+
+1.	Implementing a token contract
+When implementing a token contract, the first thing we do is copy the interface to its own Solidity file and import it, import "./erc721.sol";. Then we have our contract inherit from it, and we override each method with a function definition.
+2.	Two ways the token can be transferred. One by the owner of the contract to the receiver. Two by the approved receiver calling the transferFrom function in contract. 
+3.	Approve (present in erc721 interface) the transfer happens in 2 steps:
+You, the owner, call approve and give it the _approved address of the new owner, and the _tokenId you want them to take.
+The new owner calls transferFrom with the _tokenId. Next, the contract checks to make sure the new owner has been already approved, and then transfers them the token.
+Because this happens in 2 function calls, we need to use the zombieApprovals (mapping (uint => address) zombieApprovals;) data structure to store who's been approved for what in between function calls.
+4.	To prevent overflows and underflows we use SafeMath Library from Openzeppelin. Use - using SafeMath for uint256; using keyword is used for libraries, also gives 4 methods add, sub, mul, div.
+
+5.	assert is similar to require, where it will throw an error if false. The difference between assert and require is that require will refund the user the rest of their gas when a function fails, whereas assert will not. So most of the time you want to use require in your code; assert is typically used when something has gone horribly wrong with the code (like a uint overflow).
+6.	Different uints have different statements - 
+using SafeMath for uint256;
+using SafeMath32 for uint32;
+using SafeMath16 for uint16;
+
+Front end shit
+
+1.	Add script tag
+2.	Web3 Provider.
+Remember, Ethereum is made up of nodes that all share a copy of the same data. Setting a Web3 Provider in Web3.js tells our code which node we should be talking to handle our reads and writes. It's kind of like setting the URL of the remote web server for your API calls in a traditional web app.
+You could host your own Ethereum node as a provider. However, there's a third-party service that makes your life easier so you don't need to maintain your own Ethereum node in order to provide a DApp for your users — Infura.
+Infura is a service that maintains a set of Ethereum nodes with a caching layer for fast reads, which you can access for free through their API. Using Infura as a provider, you can reliably send and receive messages to/from the Ethereum blockchain without needing to set up and maintain your own node.
+You can set up Web3 to use Infura as your web3 provider as follows:
+var web3 = new Web3(new               Web3.providers.WebsocketProvider("wss://mainnet.infura.io/ws"));
+However, since our DApp is going to be used by many users — and these users are going to WRITE to the blockchain and not just read from it — we'll need a way for these users to sign transactions with their private key.
+Note: Ethereum (and blockchains in general) use a public / private key pair to digitally sign transactions. Think of it like an extremely secure password for a digital signature. That way if I change some data on the blockchain, I can prove via my public key that I was the one who signed it — but since no one knows my private key, no one can forge a transaction for me.
+Cryptography is complicated, so unless you're a security expert and you really know what you're doing, it's probably not a good idea to try to manage users' private keys yourself in our app's front-end.
+But luckily you don't need to — there are already services that handle this for you. The most popular of these is Metamask.
+Metamask
+Metamask is a browser extension for Chrome and Firefox that lets users securely manage their Ethereum accounts and private keys, and use these accounts to interact with websites that are using Web3.js. (If you haven't used it before, you'll definitely want to go and install it — then your browser is Web3 enabled, and you can now interact with any website that communicates with the Ethereum blockchain!).
+And as a developer, if you want users to interact with your DApp through a website in their web browser (like we're doing with our CryptoZombies game), you'll definitely want to make it Metamask-compatible.
+Note: Metamask uses Infura's servers under the hood as a web3 provider, just like we did above — but it also gives the user the option to choose their own web3 provider. So by using Metamask's web3 provider, you're giving the user a choice, and it's one less thing you have to worry about in your app.
+Using Metamask's web3 provider
+Metamask injects their web3 provider into the browser in the global JavaScript object web3. So your app can check to see if web3 exists, and if it does use web3.currentProvider as its provider.
+3.	new web3js.eth.Contract(cryptoZombiesABI, cryptoZombiesAddress)
+myContract.methods.myMethod(123).send() and myContract.methods.myMethod(123).call() // pure, view
+
+4.	Zombie[] public zombies;
+In Solidity, when you declare a variable public, it automatically creates a public "getter" function with the same name. So if you wanted to look up the zombie with id 15, you would call it as if it were a function: zombies(15).
+5.	We can see which account is currently active on the injected web3 variable via:
+var userAccount = web3.eth.accounts[0]
+
+All about events
+
+If you recall from zombiefactory.sol, we had an event called NewZombie that we fired every time a new zombie was created:
+event NewZombie(uint zombieId, string name, uint dna);
+In Web3.js, you can subscribe to an event so your web3 provider triggers some logic in your code every time it fires:
+cryptoZombies.events.NewZombie()
+.on("data", function(event) {
+  let zombie = event.returnValues;
+  // We can access this event's 3 return values on the `event.returnValues` object:
+  console.log("A new zombie was born!", zombie.zombieId, zombie.name, zombie.dna);
+}).on("error", console.error);
+Note that this would trigger an alert every time ANY zombie was created in our DApp — not just for the current user. What if we only wanted alerts for the current user?
+Using indexed
+In order to filter events and only listen for changes related to the current user, our Solidity contract would have to use the indexed keyword, like we did in the Transfer event of our ERC721 implementation:
+event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
+
+In this case, because _from and _to are indexed, that means we can filter for them in our event listener in our front end:
+// Use `filter` to only fire this code when `_to` equals `userAccount`
+cryptoZombies.events.Transfer({ filter: { _to: userAccount } })
+.on("data", function(event) {
+  let data = event.returnValues;
+  // The current user just received a zombie!
+  // Do something here to update the UI to show it
+}).on("error", console.error);
+As you can see, using events and indexed fields can be quite a useful practice for listening to changes to your contract and reflecting them in your app's front-end.
+Querying past events
+We can even query past events using getPastEvents, and use the filters fromBlock and toBlock to give Solidity a time range for the event logs ("block" in this case referring to the Ethereum block number):
+cryptoZombies.getPastEvents("NewZombie", { fromBlock: 0, toBlock: "latest" })
+.then(function(events) {
+  // `events` is an array of `event` objects that we can iterate, like we did above
+  // This code will get us a list of every zombie that was ever created
+});
+Because you can use this method to query the event logs since the beginning of time, this presents an interesting use case: Using events as a cheaper form of storage.
+If you recall, saving data to the blockchain is one of the most expensive operations in Solidity. But using events is much much cheaper in terms of gas.
+The tradeoff here is that events are not readable from inside the smart contract itself. But it's an important use-case to keep in mind if you have some data you want to be historically recorded on the blockchain so you can read it from your app's front-end.
+For example, we could use this as a historical record of zombie battles — we could create an event for every time one zombie attacks another and who won. The smart contract doesn't need this data to calculate any future outcomes, but it's useful data for users to be able to browse from the app's front-end.
+
+
+Deployment
+Truffle
+•	Truffle is the most popular blockchain development framework for good reason - it's packed with lots of useful features:
+easy smart contract compilation
+automated ABI generation
+integrated smart contract testing - there's even support for Mocha and Chai!
+support for multiple networks - code can be deployed to Rinkeby, Ethereum or even to Loom. We'll walk you through this later😉
+•	Npm install truffle – installs truffle
+•	Truffle init creates packages, directories in IDE
+•	migrations: a migration is a JavaScript file that tells Truffle how to deploy a smart contract.
+•	truffle.js and truffle-config.js: config files used to store the network settings for deployment. Truffle needs two config files because on Windows having both truffle.js and truffle.exe in the same folder might generate conflicts. Long story short - if you are running Windows, it is advised to delete truffle.js and use truffle-config.js as the default config file. Check out Truffle's official documentation to further your understanding.
+•	deploying a smart contract requires Truffle to sign transactions, we are going to need a tool called truffle-hdwallet-provider. Its only purpose is to handle the transaction signing.
+•	var Migrations = artifacts.require("./Migrations.sol");
+•	module.exports = function(deployer) {
+deployer.deploy(Migrations);
+};
+•	Pretty straightforward, isn't it?
+•	First, the script tells Truffle that we'd want to interact with the Migrations contract.
+•	Next, it exports a function that accepts an object called deployer as a parameter. This object acts as an interface between you (the developer) and Truffle's deployment engine. Even though the deployer provides a multitude of useful functions, we won't be using them in the scope of this lesson. Once you've finished, feel free to check out Truffle's documentation if you're inclined to learn more about Truffle's abilities.
+
+// Initialize HDWalletProvider
+•	const HDWalletProvider = require("truffle-hdwallet-provider");
+
+// Set your own mnemonic here
+const mnemonic = "YOUR_MNEMONIC";
+
+// Module exports to make this configuration available to Truffle itself
+module.exports = {
+// Object with configuration for each network
+networks: {
+// Configuration for mainnet
+mainnet: {
+provider: function () {
+// Setting the provider with the Infura Mainnet address and Token
+return new HDWalletProvider(mnemonic, "https://mainnet.infura.io/v3/YOUR_TOKEN")
+},
+network_id: "1"
+},
+// Configuration for rinkeby network
+rinkeby: {
+// Special function to setup the provider
+provider: function () {
+// Setting the provider with the Infura Rinkeby address and Token
+return new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/YOUR_TOKEN")
+},
+// Network id is 4 for Rinkeby
+network_id: 4
+}
+}
+};
+
+•	Command to deploy -  truffle migrate --network rinkeby
+
+Testing
+
+const CryptoZombies = artifacts.require("CryptoZombies");
+const zombieNames = ["Zombie 1", "Zombie 2"];
+contract("CryptoZombies", (accounts) => {
+    let [alice, bob] = accounts;
+    it("should be able to create a new zombie", async () => {
+        // start here
+    })
+})
+Working of an oracle
+
+- To initiate an ETH price update, the smart contract should call the getLatestEthPrice function of the oracle. Now, due to its asynchronous nature, there's no way the getLatestEthPrice function can return this bit of information. What it does return instead, is a unique id for every request. Then, the oracle goes ahead and fetches the ETH price from the Binance API and executes a callback function exposed by the caller contract. Lastly, the callback function updates the ETH price in the caller contract.
+
+Ethereum scaling –
+
+An optimistic rollup is an approach to scaling Ethereum that involves moving computation and state storage off-chain. Optimistic rollups execute transactions outside of Ethereum, but post transaction data to Mainnet as calldata.
+ Rollups – scaling soln which execute transcation outside layer 1 on another chain, but posting transaction data on layer1. This is to dervice security from ethereum consensus. 
+
+The transactions are executed on a separate chain which runs rollup specific version of evm
+
+1. Execute transaction
+2. Compresses it
+3. rollups it up in a single batch
+
+Each rollup deploys a set of smartcontracts on layer 1 that are responsible for processing deposits and withdrawls and verifying proofs
+
+proofs are also the main distinction between different types of rollups
+
+optimistic rollups fraud proofs
+zk rollups validity proofs
+
+optimistic rollups post data to layer 1 and assume it is correct. If posted data is valid, nothing. Else identify, recover to correct state and penalise the party (bond in the form of eth). 
+
+ In an optimistic rollup a centralized entity (the operator) is responsible for processing transactions and submitting rollup blocks to Ethereum
+
+Users submit transactions to “operators”, which are nodes responsible for processing transactions on the optimistic rollup. Also known as a “validator” or “aggregator”, the operator aggregates transactions, compresses the underlying data, and publishes the block on Ethereum.
+Although anyone can become a validator, optimistic rollup validators must provide a bond before producing blocks, much like a proof-of-stake system. This bond can be slashed if the validator posts an invalid block or builds on an old-but-invalid block (even if their block is valid). This way optimistic rollups utilize cryptoeconomic incentives to ensure validators act honestly.
+
+Other validators on the optimistic rollup chain are expected to execute the submitted transactions using their copy of the rollup’s state. If a validator’s final state is different from the operator’s proposed state, they can start a challenge and compute a fraud proof.
+
+Some optimistic rollups may forgo a permissionless validator system and use a single “sequencer” to execute the chain. Like a validator, the sequencer processes transactions, produces rollup blocks, and submits rollup transactions to the L1 chain (Ethereum).
+The sequencer is different from a regular rollup operator because they have greater control over the ordering of transactions. Also, the sequencer has priority access to the rollup chain and is the only entity authorized to submit transactions to the on-chain contract. Transactions from non-sequencer nodes or regular users are simply queued up in a separate inbox until the sequencer includes them in a new batch
+
+
+To achieve this they have a dispute resolution system. Any network participant can submit the fraud proof
+
+In order to execute a rollup transaction on layer 1, optimistic rollups have to implement a system that is able to replay a transaction with the exact state that was present when the transaction was originally executed on the rollup. Achieved by creating a manager contract that replaces a certain function calls with a state from the rollup
+
+
+Submitting rollup blocks to Ethereum
+As mentioned, the operator of an optimistic rollup bundles off-chain transactions into a batch and sends it to Ethereum for notarization. This process involves compressing transaction-related data and publishing it on Ethereum as calldata.
+calldata is a non-modifiable, non-persistent area in a smart contract that behaves mostly like memory. While calldata persists on-chain as part of the blockchain's history logs(opens in a new tab)↗, it is not stored as a part of Ethereum's state. Because calldata does not touch any part of Ethereum's state, it is cheaper for storing data on-chain.
+The calldata keyword is also used in Solidity to pass arguments to a smart contract function at execution time. calldata identifies the function being called during a transaction and holds inputs to the function in the form of an arbitrary sequence of bytes.
+In the context of optimistic rollups, calldata is used to send compressed transaction data to the on-chain contract. The rollup operator adds a new batch by calling the required function in the rollup contract and passing the compressed data as function arguments. Using calldata reduces user fees since most costs that rollups incur come from storing data on-chain.
+Here is an example(opens in a new tab)↗ of a rollup batch submission to show how this concept works. The sequencer invoked the appendSequencerBatch() method and passed the compressed transaction data as inputs using calldata
+
+Zksync
+zkSync relies on a smart contract deployed to the Ethereum network to hold all assets, while most computations are performed off-chain. Every time you sign a transaction, the protocol submits it to operators who roll up multiple transactions (potentially thousands) into a block, and compute the following:
+
+ZK Rollup is an L2 scaling solution in which all funds are held by a smart contract on the mainchain, while computation and storage are performed off-chain. The contract you created, first gets deployed on L2, the ZK rollup chain, hence you need to deposit some ETH to L2 (the ZK rollup chain)
+cryptographic commitment (root hash)
+cryptographic proof (the SNARK)
+state ∆, representing a small amount of data for each transaction
+All this stuff is then sent to the smart contract running on the Ethereum network. This enables an interested party to reconstruct the state at any given point in time.
+The SNARK verification is significantly cheaper than verifying every transaction individually, and storing the state off-chain is also much cheaper than storing it in EVM.
+This enables a boost in scalability and transaction cost saving
+A provider works like a bridge that makes JavaScript function calls compatible with zkSync. The beauty of it is that, to use it, you don't have to understand how it works under the hood.
+
+ 
+
+
+ 
+
+
+1. Transaction submitted to zksync operator
+2. All transactions arranged in blocks on zksync chain
+3. After zksync creates a block it pushed to zksync contract on mainnet (Commit transaction)
+4. After 2 mins,, ZKProof is produced which is published to mainnet – (Verify)
+5. Block state becomes final
+
+
+Tornado cash
+- Using tornado cash you can bbreak the link between sender and receiver. From the address of the receiver it is impossible to link back to the sender. 
+- If A sends 100 eth to B through tornado cash, you will be able to see A deposit 100 eth to tornado cash and 100 eth transferred to B, but you cant see the link between A and B. 
+- When you deposit to TC, a secret key is generated. When you want to transfer the deposited token, you enter the secret key and recipient’s address. It will automatically send all the money deposited in that transaction to the recipient. 
+- When the withdraw happens, a ZK snark proof is generated. 
+
+Tornado cash deposits
+1.  Before anyone deposits they have to pick 2 random numbers – secret and nullifier and then a hash of these two numbers are computed. Then they have to send the amout to deposit and the hash (commitment) to tornado cash  smart contract
+2.  This has is later going to be used to withdraw from tornado cash
+3. Revealing the secret and nullifier reveals the identity of the withdrawer, hence there has to be a way where you tell that you know secret and verifier without actually revealing secret and verifier. This is zk proof
+4. Along with the proof you also have to send the hash of the nullifier, so that the same proof cannot be used twice (double spend)
+5. The smart contract of tornado cash has 3 parts – the part that manages eth going in and out, the merkle tree that keeps track of the deposit hashes, zk snark verifier contract that verifies the withdrawers proof. 
+6. The zk snark verifier contract is built using 2 tools. First is a library called Circom. Using circom, the arithmetic circuit is written. This contains logic to prove that hash is included in the merkle tree. Once this arithmetic ckt is written, we pass it to another tool called snarkJs, which automatically creates zk smart contract. 
+ 	
+- When you deposit your 1 ETH on the contract, you have to provide a “commitment”. This commitment is stored by the smart contract. When you withdraw 1 ETH on the other side, you have to provide a “nullifier” and a zero-knowledge proof.
+-	The nullifier is a unique ID that is in connection with the commitment and the ZKP proves the connection, but nobody knows which nullifier is assigned to which commitment (except the owner of the depositor/withdrawal account). The nullifiers are tracked by the smart contract, so we can withdraw only one deposited ETH with one nullifier.
+
+pragma circom 2.0.0; 
+
+-	include "node_modules/circomlib/circuits/bitify.circom"; 
+
+-	include "node_modules/circomlib/circuits/pedersen.circom"; 
+
+-	template Main() { 
+
+-	signal input nullifier; // signal is like a wire or a connection 
+-	signal output nullifierHash; 
+
+-	component nullifierHasher = Pedersen(248);  // building block that encapsulates a specific functionality or operation within a digital circuit  like functions or subroutines
+-	component nullifierBits = Num2Bits(248); 
+
+-	nullifierBits.in <== nullifier; // in is a port in this component // which receives the input
+
+-	for (var i = 0; i < 248; i++) { 
+-	nullifierHasher.in[i] <== nullifierBits.out[i]; 
+-	} 
+
+-	nullifierHash <== nullifierHasher.out[0]; 
+-	} 
+component main = Main();
+
+
+Here's a high-level overview of how you might use this circuit to generate a zk-SNARK proof:
+1.	Define the Circuit: You've already defined a part of the circuit in your provided code, which calculates the Pedersen hash of a nullifier. You may have other components or subcircuits as well, depending on the specific requirements of your application.
+2.	Create Input and Output Variables: Identify the input and output signals of your circuit that need to be part of the proof. In your code, nullifier and nullifierHash are two such signals.
+3.	Generate Proving and Verification Keys: Use a zk-SNARK library like libsnark, snarkjs, or another tool to generate proving and verification keys for your circuit. These keys are crucial for zk-SNARK operations.
+4.	Provide Inputs: For zk-SNARK proof generation, you need to provide specific inputs to your circuit. In this case, you might set the nullifier signal to a specific value you want to prove knowledge of, and let the circuit compute the corresponding nullifierHash.
+5.	Generate a Proof: Use the proving key, the inputs, and your circuit to generate a zk-SNARK proof. The exact method for doing this depends on the zk-SNARK library you are using. This proof will prove that you know the nullifier without revealing its value.
+6.	Verify the Proof: The verification key is used to verify that the generated proof is valid. Anyone can use the verification key to confirm that the proof is correct without knowing the nullifier.
+7.	Integration into Your Application: You can integrate the zk-SNARK proof generation and verification steps into your application or system to enable privacy-preserving operations. For example, this might be used in a cryptocurrency system to prove ownership without revealing specific transaction details.
+ 
+
+ 
+Snarkjs is a full-featured tool to generate the proving key and the verification key by the ceremony, generate the proof, and validate it
+The Proving and Verification Keys are generated during “ceremony”. 
+
+How TC Works!
+
+When you deposit 1 eth on TC, you also provide a Commitment Hash, which will be stored in Merkel Tree. 
+When you withdraw this 1 ETH with a different account, you have to provide 2 zero-knowledge proofs.
+The first proves that the Merkel tree contains your commitment. This proof is a zero-knowledge proof of a Merkle proof.
+But this is not enough, because you should be allowed to withdraw this 1 ETH only once. Because of this, you have to provide a nullifier that is unique for the commitment. The contract stores this nullifier, this ensures that you don’t be able to withdraw the deposited money more than one time.
+The uniqueness of the nullifier is ensured by the commitment generation method. The commitment is generated from the nullifier and a secret by hashing
+
+Inputs – Nullifier, Secret
+Outputs – Nullifier Hash, Commitment (nullifier + secret)
+
+
+
+include "../node_modules/circomlib/circuits/bitify.circom"; 
+include "../node_modules/circomlib/circuits/pedersen.circom"; 
+include "merkleTree.circom"; // computes Pedersen(nullifier + secret) 
+template CommitmentHasher() 
+{ 
+signal input nullifier; 
+signal input secret; 
+signal output commitment; 
+signal output nullifierHash; 
+component commitmentHasher = Pedersen(496); 
+component nullifierHasher = Pedersen(248); 
+component nullifierBits = Num2Bits(248); 
+component secretBits = Num2Bits(248); 
+nullifierBits.in <== nullifier; 
+secretBits.in <== secret; 
+for (var i = 0; i < 248; i++) 
+{ 
+nullifierHasher.in[i] <== nullifierBits.out[i]; 
+commitmentHasher.in[i] <== nullifierBits.out[i]; 
+commitmentHasher.in[i + 248] <== secretBits.out[i]; 
+} 
+commitment <== commitmentHasher.out[0]; 
+nullifierHash <== nullifierHasher.out[0]; 
+} 
+// Verifies that commitment that corresponds to given secret and nullifier is included in the merkle tree of deposits 
+template Withdraw(levels)// depth of the merkel tree which is used to // store commitment hashes
+ { 
+signal input root; 
+signal input nullifierHash; 
+
+// In the context of a Circom circuit, private inputs are values that are not publicly known or // exposed outside of the circuit. They are typically provided as input when the circuit is // executed, but they are not part of the information that gets revealed in the final zk-SNARK // proof.
+signal private input nullifier; 
+signal private input secret; 
+signal private input pathElements[levels]; 
+signal private input pathIndices[levels]; 
+component hasher = CommitmentHasher(); 
+hasher.nullifier <== nullifier;
+ hasher.secret <== secret; 
+hasher.nullifierHash === nullifierHash; 
+component tree = MerkleTreeChecker(levels); 
+tree.leaf <== hasher.commitment; 
+tree.root <== root; 
+for (var i = 0; i < levels; i++) 
+{ 
+tree.pathElements[i] <== pathElements[i]; 
+tree.pathIndices[i] <== pathIndices[i]; 
+} 
+} 
+component main = Withdraw(20);
+Snarkjs and Circom
+
+1.	Compile circom file using circom compiler that will genrerate a wasm (like bytecode in java) and r1cs file (R1CS is a mathematical framework for expressing the relationships between variables in a computation or circuit)
+2.	To generate proof, we need Proving Key file (zkey file) and to generate that ,we need a ptau file. This can be generated by snarkjs
+3.	Now we have to generate the proof with a js fuction call using snarkjs and circuit and proving key
+4.	Now we need to generate a Verification Key using Proving key
+5.	Using this VKey, we can verify the generated proof
+
+
+Mina Protocol
+
+Mina is an L1 blockchain based on zero-knowledge proofs (“ZKP”) with smart contracts written in TypeScript. It is the first cryptocurrency protocol with a succinct blockchain (22KB).
+Early blockchains, like Bitcoin and Ethereum, accumulate data over time and are currently hundreds of gigabytes in size. As time goes on, their blockchains will continue to increase in size. The entire chain history is required in order to verify the current consensus state of these networks.
+With Mina, the blockchain always remains a constant size–about 22KB (the size of a few tweets). It’s possible to verify the current consensus state of the protocol using this one recursive, 22KB zero-knowledge proof. This means participants can quickly sync and verify the current consensus state of the network.///
+The Mina network is secured by proof-of-stake (“PoS”) consensus called Ouroboros Samisika.
+What are zkApps?
+zkApps ("zero-knowledge apps") are Mina Protocol’s smart contracts powered by zero-knowledge proofs, specifically using zk-SNARKs.
+zkApps use an off-chain execution and mostly off-chain state model. This allows for private computation and state that can be either private or public.
+zkApps can perform arbitrarily-complex computations off chain while incurring only a flat fee to send the resulting zero-knowledge proof to the chain for verification of this computation, as opposed to other blockchains that run computations on chain and use a variable gas-fee based model.
+The term “smart contract” refers to the code written with SnarkyJS.
+The term “zkApp” refers to the UI + the smart contract
+Because zkApps are based on zero-knowledge proofs (zk-SNARKs), a zkApp developer writes what is called a “circuit”. A circuit is the method from which a prover function and a corresponding verifier function are derived during the build process.
+The prover function is the function that executes a smart contract’s custom logic.
+The prover function runs in a user’s web browser as part of the zkApp. When interacting with a zkApp's UI, users enter any data (e.g. “buy ABC for y price”) required as input to the prover function, which then generates a zero-knowledge proof.
+The verifier function is the function that validates whether a zero-knowledge proof successfully passes all the constraints defined in the prover function.
+Within the Mina network, Mina acts as the verifier and runs the verifier function.
+Deploying a smart contract
+Smart contract deployment to chain = sending transaction which has verification key. Verification key lives on chain in to  verify zero-knowledge proof has met all constraints. Mina address + verification key = zkApp Account. a zkApp account can only successfully receive transactions that contain a proof that satisfies the verifier function. 
+
+Flow
+After a zkApp is deployed to a host (e.g. mycoolzkapp.com), users can interact with it:
+1.	User visits mycoolzkapp.com.
+2.	User interacts with the zkApp and enters any data as required. (For example, if this were an automated market maker, the user might specify to “buy x amount of ABC at y price”.)
+3.	The prover function in the zkApp generates a zero-knowledge proof locally using the data entered by the user. This data can be either private (which is never be seen by the blockchain) or public (which is stored either on chain or off chain), depending on what the developer specified, as needed for a given use case. Additionally, a list of state updates (called account updates) to be created by this transaction is generated and is associated with this proof.
+4.	User clicks “submit to chain” in the zkApp UI and their wallet (such as a browser extension wallet) prompts them to confirm sending the transaction. The wallet signs the transaction that contains the proof and associated description of state to update and sends it to the Mina blockchain.
+5.	When the Mina network receives this transaction, it verifies that the proof successfully passes the verifier method listed on the zkApp account. If the network accepts this transaction, this indicates that this proof and the requested state changes are valid and, as such, are allowed to update the zkApp’s state.
+
+
+SnarkyJS
+
+- Field = uint256
+-	const x = Circuit.if(new Bool(foo), a, b); // behaves like `foo ? a : b`
+
+https://docs.minaprotocol.com/zkapps/snarkyjs-reference
+- https://docs.minaprotocol.com/zkapps/snarkyjs-reference
+
+-	Smart contracts are written by extending the base class SmartContract:
+class HelloWorld extends SmartContract {}
+
+Under the hood, every @method defines a zk-SNARK circuit. From the cryptography standpoint, a smart contract is a collection of circuits, all of which are compiled into a single prover & verification key. The proof says something to the effect of "I ran one of these methods, with some private input, and it produced this particular set of account updates". In ZKP terms, the account updates are the public input. The proof will only be accepted on the network if it verifies against the verification key stored in the account. This ensures that indeed, the same code that the zkApp developer wrote also ran on the user's device – thus, the account updates conform to the smart contract's rules.
+
+On-chain state
+A smart contract can contain on-chain state, which is declared as a property on the class with the @state decorator:
+class HelloWorld extends SmartContract {
+  @state(Field) x = State<Field>();
+
+  // ...
+}
+
+All about Zk Prover Verifier Witness
+
+A zero-knowledge proof is a way of proving the validity of a statement without revealing the statement itself. 
+
+The ‘prover’ is the party trying to prove a claim, while the ‘verifier’ is responsible for validating the claim.
+
+Consider how you might prove a claim (e.g., “I am a citizen of X country”) to another party (e.g., a service provider). But there are problems with this approach, chiefly the lack of privacy. Zero-knowledge proofs solve this problem by eliminating the need to reveal information to prove validity of claims. The zero-knowledge protocol uses the statement (called a ‘witness’) as input to generate a succinct proof of its validity. 
+
+How ZK proofs work?
+
+Interactive ZKP – Prover and Verifiers do back and forth communication answering questions 
+Non Intercatuve ZKP – Prover and verifier have a shared key. Unlike interactive proofs, noninteractive proofs required only one round of communication between participants (prover and verifier). The prover passes the secret information to a special algorithm to compute a zero-knowledge proof. This proof is sent to the verifier, who checks that the prover knows the secret information using another algorithm. The ‘shared key’ mentioned earlier refers to public parameters that the prover and verifier agree to use in generating and verifying proofs
+
+Witness -> Spl algorithm -> ZKP -> Verifier Checks ZKP using another algorithm
+
+Types of ZKP
+ZKSNARK -  Zero-Knowledge Succinct Non-Interactive Argument of Knowledge
+ZKSTARK - Zero-Knowledge Scalable Transparent Argument of Knowledge.
+
+ZK-STARK is faster than ZK-SNARK at generating and verifying proofs when the size of the witness is larger
+
+
+
+
+
+
+    
+Nest Js Commands
+1.	yarn start:dev
+2.	nest g module <module name>
+3.	@Injectable for service (providers)
+4.	docker compose up <service name> -d
+5.	ORM to connect app to db. This example is using Prisma. You have to install prisma cli, prisma client
+
+6.	Prisma migrate dev – reads schema and generates migrations
+7.	
+
+I have around 4 yrs of work experience as SDE, but was always a proponent of decentralized internet. Now I felt now was the right time to take the plunge, hence trying to breakthrough into blockchain space.
+In my NFT project, I was trying to add more functionality to it by adding a feature where one can dynamically generate picture with textual input using generative AI techniques. I wanted to see if there is any company which is exposing APIs for me to do so. I spent quite a lot of time in figuring this and even sent mails to some companies if they allow users to use their APIs for a free/discounted price. I then thought I will myself run the Stable diffusion model on my computer and try to generate the picture. But that could not work out as my system's RAM was too low for the model to smoothly execute. Then after days of search, I finally found hugging face which is exposing APIs for picture generation. I was elated when I could hit the API from postman and the desired picture was generated!
+
+I have used AAVE, 1inch, Chainlink VRF, Aggregator in some of my projects. Details about the same  can be found in my github.
+The Graph
+
+Data in blockchain was scattered, slow and difficult. That was an issue. 	
+
+It is an indexing protocol. 
+
+Components of Blockchain
+1. Subgraph Definition Language SDL – A subgraph is a unit of indexing within The Graph. It defines the data model, schema, and indexing rules for extracting and organizing specific data from a blockchain.
+2. Graph Node – The Graph Node is responsible for indexing and processing data according to the defined subgraphs. It listens to blockchain events, retrieves relevant data, and stores it in a structured format optimized for querying. Multiple independent Graph Nodes form a decentralized network to provide redundancy and fault tolerance.
+3. Graph Explorer: The Graph Explorer is a web-based interface that allows users to discover and explore available subgraphs. It provides a way to search for subgraphs, view their schemas, and understand the available data entities and attributes.
+3. The GraphQL API is the interface through which developers can query and retrieve data from the indexed subgraphs. It acts as a layer that sits on top of the Graph Node and provides a unified way to access data from different subgraphs. When a GraphQL query is sent, the GraphQL API routes the request to the appropriate Graph Node(s) that have indexed the relevant subgraphs. The Graph Node then processes the query against the indexed data and returns the requested data in response.
+4. Indexer: Indexers are participants in The Graph network who run and operate Graph Nodes. They choose which subgraphs to index and maintain, contributing to the overall availability and performance of the network. Indexers earn rewards for indexing and serving data to applications.
+Curator: Curators are individuals or organizations who identify and signal their interest in specific subgraphs. They contribute to the curation of the network by signaling which subgraphs are valuable and should be indexed. Curators can earn rewards based on the success of the subgraphs they curate. Curators help indexers know which subgraph to index. 
+
+Subgraph : ETLQ – Extract (JSON-RPC Polling), Transform (Assembly Script WASM), Load (PostgreSQL), Query (GraphQL)
+
+i. Extract – Firehose -> Stream
+
+ii. Transformation - Substream is a powerful cluster engine to process blockchain data, grpc service, rust modules, deterministic, parallelizable engine, infusible with firehose guarantees. 
+
+ Manifest – substreams.yaml 
+
+- Initial lines- package information, meta data
+- Protobufs – are methods of serializing data that can be transmitted over a wire or stored in files. Faster than json/XML 
+iii. Data from substreams go to sinks – dbs, queues etc.  
+
+
+The Graph
+-	Used for indexing and querying blockchain data
+-	The Graph learns what and how to index Ethereum data based on subgraph descriptions, known as the subgraph manifest
+-	The subgraph description defines the smart contracts of interest for a subgraph, the events in those contracts to pay attention to, and how to map event data to data that The Graph will store in its database.
+-	Once you have written a subgraph manifest, you use the Graph CLI to store the definition in IPFS and tell the indexer to start indexing data for that subgraph.
+The flow follows these steps:
+1.	A dapp adds data to Ethereum through a transaction on a smart contract.
+2.	The smart contract emits one or more events while processing the transaction.
+3.	Graph Node continually scans Ethereum for new blocks and the data for your subgraph they may contain.
+4.	Graph Node finds Ethereum events for your subgraph in these blocks and runs the mapping handlers you provided. The mapping is a WASM module that creates or updates the data entities that Graph Node stores in response to Ethereum events.
+5.	The dapp queries the Graph Node for data indexed from the blockchain, using the node's GraphQL endpoint. The Graph Node in turn translates the GraphQL queries into queries for its underlying data store in order to fetch this data, making use of the store's indexing capabilities. The dapp displays this data in a rich UI for end-users, which they use to issue new transactions on Ethereum. The cycle repeats.
+
+Subgraph lifecycle: 
+Build locally->Deploy to Subgraph Studio->Publish to the network->Signal to encourage indexing
+In order to make queries, developers must generate an API key, which can be done in the Subgraph Studio. This API key must be funded with GRT, in order to pay query fees.
+The Graph Explorer:
+The Graph Explorer consists of multiple parts where you can interact with other subgraph developers, dapp developers, Curators, Indexers, and Delegators
+Creating a subgraph:
+- A subgraph extracts data from a blockchain, processing it and storing it so that it can be easily queried via GraphQL.
+
+The subgraph definition consists of a few files:
+subgraph.yaml: a YAML file containing the subgraph manifest
+schema.graphql: a GraphQL schema that defines what data is stored for your subgraph, and how to query it via GraphQL
+AssemblyScript Mappings: AssemblyScript code that translates from the event data to the entities defined in your schema (e.g. mapping.ts in this tutorial)
+In order to use your subgraph on The Graph's decentralized network, you will need to create an API key. It is recommended that you add signal to your subgraph with at least 10,000 GRT. And also install Graph CLI
+Use graph init command to setup a new graph project
+
+Substreams
+
+A powerful clustered engine to process blockchain data. Is invoked as a single grpc call and within the request we provide all the transformation code like wasm modules, relationship b/w the modules. Modules are written in rust and compile to wasm and they are running a secure sandboxsimilar to subgraphs. 
+1.	Substreams.yaml – The manifest
+The manifest is a YAML-based file and provides vital insights into the blockchain being targeted, the design of the data flow, the names and types of modules, and locations and names for protobuf definitions. Manifests contain references to the protobufs for your Substreams module. Protocol Buffers, also referred to as protobufs, are used as the API for data models specific to the different blockchains. Protobufs define the input and output for modules. The ERC721 smart contract used in the Substreams Template example contains a Transfer event. You can use the event data through a custom protobuf.
+The protobuf file serves as the interface between the module handlers and the data being provided by Substreams.
+
+Protobuf defn -> Prostl -> Rust code
+Generating protobufs
+The substreams CLI is used to generate the associated Rust code for the protobuf.
+The pairing code is generated and saved into the src/pb/eth.erc721.v1.rsRust file.
+
+The mod.rs file located in the src/pb directory of the Substreams Template example is responsible for exporting the freshly generated Rust code.
+
+Substreams uses two types of modules, map and store.
+•	map modules are functions receiving bytes as input and output. These bytes are encoded protobuf messages.
+•	store modules are stateful, saving and tracking data through the use of key-value stores. store modules write to key-value stores.
+Inputs
+Modules receive inputs of three types:
+•	source
+•	map
+•	store
+•	params
+
+Defi
+Uniswap v2 swap tokens - 
+
+Inside the uniswap interface we need to call the smart contract called uniswap v2 router and call the function swapExactTokensForToken. 
+
+Dai to weth and weth to wbtc
+
+
+ Contribute to Open source projects
+1. Go to the issues section on the repository
+2. Filter by first timers only. Or filter by label like- label:”Hacktoberfest” or goodFirstIssue or language:”javascript ”
+3. Search for ToDo
+4. Creating an issue. Single hash – heading 1, double hash – heading 2 and so on. ** for bold. * Italic. ~~ for strikethrough. [] for checkbox or [x]. [LinkName]actual link. 
