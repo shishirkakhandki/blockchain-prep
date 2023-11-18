@@ -824,14 +824,22 @@ Both MythX and Mythril are created by the same team, and are used to analyze byt
 •	Mythril is a free and open-source smart contract security analyzer. It uses symbolic execution to detect a variety of security vulnerabilities. It runs on your local machine.
 •	MythX is a cloud-based smart contract security service. It performs security analysis remotely, accepting jobs and returning results via an API. A free version is available, but for a complete analysis you must sign up and purchase a subscription.
 
-
-
 3. Classification - 
 
 SWC-Registry - SWC definitions and a large repository of crafted and real-world samples of vulnerable smart contracts.
 SWC Pages - The SWC-registry repo published on Github Pages
 
+4. Testing
+solidity-coverage - Code coverage for Solidity testing.
+solidity-shell - An interactive Solidity shell with lightweight session recording and remote compiler support.
+chisel - Chisel is a fast, utilitarian, and verbose solidity REPL. It is heavily inspired by the incredible work done in soli and solidity-shell!
+soli - Solidity REPL
 
+5. Linters and Formatters
+Linters improve code quality by enforcing rules for style and composition, making code easier to read and review.
+•	Ethlint - Yet another Solidity linting.
+•	Solhint - A linter for Solidity that provides both Security and Style Guide validations.
+•	Prettier + Solidity Plugin - Prettier enforce
 
 
 
